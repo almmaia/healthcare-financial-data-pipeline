@@ -1,40 +1,131 @@
-Data Pipeline ANS - Processamento Contábil
-Este repositório contém uma solução de ETL (Extração, Transformação e Carga) desenvolvida em Java para consolidar dados contábeis de operadoras de saúde suplementar, conforme requisitos da ANS.
+# Healthcare Financial Data Pipeline (Java ETL)
 
-🛠️ Decisões Técnicas e Arquitetura
-O projeto foi estruturado com foco em resiliência e boas práticas de desenvolvimento:
+Robust ETL pipeline built in Java to process and consolidate financial data from Brazilian healthcare operators (ANS).
 
-Pipeline de Dados (Java)
-Resiliência no Download: Devido à instabilidade frequente nos servidores da ANS, o sistema implementa um User-Agent para evitar bloqueios e possui uma rotina de contingência que utiliza dados locais na pasta extraido caso o download falhe.
+This project simulates a production-style data engineering workflow focused on resilience, validation and relational modeling.
 
-Tratamento de Dados: Seguindo uma análise crítica, valores negativos de despesas foram normalizados para 0.0, garantindo que inconsistências contábeis não distorçam os resultados finais.
+---
 
-Validação: Implementação de coluna de status para validação de integridade de CNPJ no arquivo consolidado.
+## 🚀 Overview
 
-Camada de Dados (SQL)
-Foi adotado um modelo relacional normalizado para garantir a integridade referencial e facilitar consultas analíticas:
+Public healthcare financial data in Brazil is often unstable and inconsistent.
+This pipeline demonstrates how to build a resilient backend process capable of extracting, validating and consolidating financial records for analytics and auditing.
 
-Tabela: operadoras | Coluna | Tipo | Descrição | | :--- | :--- | :--- | | cnpj | VARCHAR(14) | Chave Primária | | razao_social | VARCHAR(255) | Nome da operadora | | uf | CHAR(2) | Estado |
+The system:
 
-Tabela: despesas | Coluna | Tipo | Descrição | | :--- | :--- | :--- | | id | SERIAL | Chave Primária | | cnpj_operadora | VARCHAR(14) | Chave Estrangeira (FK) | | valor_despesa | DECIMAL(15,2) | Valor processado |
+* downloads datasets from ANS
+* handles unstable servers with fallback strategy
+* normalizes inconsistent financial values
+* validates CNPJ integrity
+* loads into relational SQL model
+* generates consolidated CSV ready for analysis
 
-🚀 Tecnologias e Versionamento
-Java 21 & Maven para gestão de dependências.
+---
 
-Git para controle de versão, seguindo um fluxo de commits organizado.
+## 🧠 Engineering Decisions
 
-SQL ANSI para portabilidade entre diferentes bancos de dados.
+### Resilient Extraction
 
-📂 Estrutura de Pastas
-/src/main/java: Lógica de processamento e serviços.
+ANS servers frequently fail or block automated downloads.
 
-/src/main/resources/scripts_sql: Scripts DDL e Queries analíticas.
+Implemented:
 
-/arquivos_ans: Local de saída do arquivo consolidado.csv.
+* custom User-Agent
+* retry strategy
+* fallback to local dataset
 
-⚙️ Como Executar
-Importe o projeto como um projeto Maven.
+Ensures pipeline execution even if external source fails.
 
-Execute a classe com.intuitive.main.MainApp.
+### Data Normalization
 
-O log no console indicará se o processamento utilizou o download em tempo real ou o mock local.
+Negative expense values are normalized to `0.0` to prevent financial distortion in aggregated analysis.
+
+### Validation Layer
+
+CNPJ validation status column added to consolidated dataset to ensure data integrity.
+
+---
+
+## 🏗 Architecture
+
+```
+Download → Validate → Transform → Normalize → Load → Consolidated Output
+```
+
+Clean separation of concerns following backend best practices.
+
+---
+
+## 🗄️ Database Model
+
+### operadoras
+
+| column       | type         | description   |
+| ------------ | ------------ | ------------- |
+| cnpj         | VARCHAR(14)  | Primary key   |
+| razao_social | VARCHAR(255) | Operator name |
+| uf           | CHAR(2)      | State         |
+
+### despesas
+
+| column         | type          | description     |
+| -------------- | ------------- | --------------- |
+| id             | SERIAL        | Primary key     |
+| cnpj_operadora | VARCHAR(14)   | Foreign key     |
+| valor_despesa  | DECIMAL(15,2) | Processed value |
+
+---
+
+## 🛠 Tech Stack
+
+* Java 21
+* Maven
+* SQL (ANSI)
+* Git
+* ETL architecture
+* Data validation
+
+---
+
+## 📂 Project Structure
+
+```
+src/main/java → processing logic  
+src/main/resources/scripts_sql → SQL scripts  
+arquivos_ans → consolidated output  
+```
+
+---
+
+## ⚙️ Running
+
+1. Import as Maven project
+2. Run:
+
+```
+MainApp.java
+```
+
+Console logs will show if data came from:
+
+* live ANS download
+* local fallback dataset
+
+---
+
+## 🎯 What This Project Demonstrates
+
+* Backend engineering with Java
+* ETL pipeline design
+* Handling unreliable external data
+* Financial data normalization
+* Relational modeling
+* Clean architecture
+
+---
+
+## 👨‍💻 Author
+
+Alan Maia
+Backend & Data Engineering focused
+Brazil
